@@ -1,0 +1,101 @@
+NAME
+    App::Sysadmin::Log::Simple - application class for managing a simple
+    sysadmin log
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        require App::Sysadmin::Log::Simple;
+        App::Sysadmin::Log::Simple->new(logdir => '/tmp/my/logdir')->run({});
+
+DESCRIPTION
+    "App::Sysadmin::Log::Simple" provides an easy way to maintain a simple
+    single-host system administration log.
+
+    The log is single-host in the sense that it does not log anything about
+    the host. While you can obviously state what host you're talking about
+    in your log entry, there is nothing done automatically to differentiate
+    such log entries, and there is no built-in way to log from one host to
+    another.
+
+    The logs themselves are also simple - you get a single line of plain
+    text to say what you have to say. That line gets logged in a fashion
+    that is easy to read with this script, with cat, or it can be parsed
+    with Text::Markdown (or Text::MultiMarkdown, which is a more modern
+    drop-in replacement) and served on the web.
+
+    There is also no way to audit that the logs are correct. It can be
+    incorrect in a number of ways:
+
+    *   SUDO_USER or USER can be spoofed
+
+    *   The files can be edited at any time, they are chmod 644 and owned by
+        an unprivileged user
+
+    *   The timestamp depends on the system clock
+
+    *   ...etc
+
+    Nonetheless, this is a simple, easy, and fast way to get a useful script
+    for managing a simple sysadmin log. We believe the 80/20 rule applies:
+    You can get 80% of the functionality with only 20% of a "real" solution.
+
+METHODS
+  new
+    Obviously, the constructor returns an "App::Sysadmin::Log::Simple"
+    object. It takes a hash of options which specify:
+
+    *   logdir
+
+        The directory where to find the sysadmin log.
+
+    *   user
+
+        The user who owns the sysadmin log. Should be unprivileged, but
+        could be anything.
+
+    *   preamble
+
+        The text to prepend to the index page. Can be anything - by default,
+        it is a short explanation of the rationale for using this system of
+        logging, which probably won't make sense for your context.
+
+    *   date (optional)
+
+        The date to use instead of today.
+
+  run
+    This runs the application with the options specified in a hash:
+
+    *   view (optional)
+
+        Whether to view the log instead of add to it
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/App-Sysadmin-Log-Simple/>.
+
+    The development version lives at
+    <http://github.com/doherty/App-Sysadmin-Log-Simple> and may be cloned
+    from <git://github.com/doherty/App-Sysadmin-Log-Simple.git>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://github.com/doherty/App-Sysadmin-Log-Simple/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

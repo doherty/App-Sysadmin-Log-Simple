@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+package log;
+# ABSTRACT: maintain a single-host system administration log
+
+use perl5i::2;
+use Getopt::Long;
+use Pod::Usage;
+require App::Sysadmin::Log::Simple;
+
+my %opts = (
+    user    => 'mike',
+);
+$opts{logdir} = "/home/$opts{user}/sysadmin-log";
+$opts{preamble} = <<'END';
+INDEX
+=====
+
+This page indexes all the logs. For each line, you see a timestamp
+for the line, the user who added the line, and then the comments.
+This method of logging is less transparent than logging to the
+wiki, but is more reliable:
+
+* We can't rely on having apache and MySQL available, especially
+since logging is often due to issues with those.
+* In fact, all that's needed is filesystem access.
+* Shell access is required to log, so there probably aren't bogus
+log entries.
+END
+
+GetOptions( \%opts,
+    'help|?',
+    'version',
+    'view',
+    'date:s',
+    'logdir:s',
+    'user:s',
+    'preamble:s',
+);
+
+=head1 SYNOPSIS
+
+B<log> [--date YYYY/MM/DD] [--view] [--version] [--help]
+
+Options:
+    B<--date>       Read from/write to a date other than today's
+    B<--view>       View a log file instead of add to it
+    B<--logdir>     Use a different log directory
+    B<--version>    Print version information, then exit
+    B<--help>       Show this manpage
+
+=head1 DESCRIPTION
+
+C<B<log>> allows you to maintain a single-host system
+administration log with simple shell commands.
+
+=head2 OPTIONS
+
+=over 4
+
+=item B<--date>
+
+Which date to use instead of today's date. This allows you to add
+entries to old logs, or view old logs. Providing a future date is
+a fatal error.
+
+=item B<--view>
+
+View a log instead of adding to it.
+
+=item B<--logdir>
+
+Sets the log directory to use - defaults to F</home/mike/sysadmin-log>.
+
+=item B<--help>, --man, -?
+
+View this documentation.
+
+=cut
+
+pod2usage(
+    -verbose => 2,
+) if $opts{help};
+
+=item B<--version>
+
+View version data.
+
+=cut
+
+if ($opts{version}) {
+    say "$0 version " . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev')
+        and exit;
+}
+
+=back
+
+=cut
+
+App::Sysadmin::Log::Simple->new(%opts)->run(%opts);
