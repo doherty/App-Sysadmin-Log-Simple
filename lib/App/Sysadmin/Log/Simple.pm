@@ -139,6 +139,11 @@ method run(%opts) {
             print;
         }
     }
+    elsif ($opts{'refresh-index'}) {
+        say 'Refreshing index...';
+        $self->_generate_index();
+        say 'Done.';
+    }
     else { # Add a new log entry
         my $year  = $self->{date}->year;
         my $month = $self->{date}->month;

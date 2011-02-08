@@ -35,7 +35,7 @@ GetOptions( \%opts,
     'date:s',
     'logdir:s',
     'user:s',
-    'preamble:s',
+    'refresh-index',
 );
 
 =head1 SYNOPSIS
@@ -46,6 +46,7 @@ Options:
     B<--date>       Read from/write to a date other than today's
     B<--view>       View a log file instead of add to it
     B<--logdir>     Use a different log directory
+    B<--refresh-index> Just refresh the index
     B<--version>    Print version information, then exit
     B<--help>       Show this manpage
 
@@ -71,6 +72,10 @@ View a log instead of adding to it.
 =item B<--logdir>
 
 Sets the log directory to use - defaults to F</home/mike/sysadmin-log>.
+
+=item B<--refresh-index>
+
+Refresh the index of logs and exit.
 
 =item B<--help>, --man, -?
 
