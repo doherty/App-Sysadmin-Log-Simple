@@ -3,8 +3,7 @@ package App::Sysadmin::Log::Simple;
 
 use perl5i::2;
 use File::Path 2.00 qw(make_path);
-use File::Find::Rule;
-use IO::Pager;
+
 
 =head1 SYNOPSIS
 
@@ -90,15 +89,16 @@ method new($class: %opts) {
             year  => $in_year,
             month => $in_month,
             day   => $in_day,
-        ) or carp "Couldn't understand your date - use YYYY/MM/DD\n";
-        carp "Cannot use a date in the future\n" if $in_date > $datetimeobj;
+        ) or croak "Couldn't understand your date - use YYYY/MM/DD\n";
+        croak "Cannot use a date in the future\n" if $in_date > $datetimeobj;
         $datetimeobj = $in_date;
     }
     my $self = {
         date     => $datetimeobj,
         logdir   => $opts{logdir},
         user     => $opts{user},
-        preamble => $opts{preamble},
+        index_preamble => $opts{index_preamble},
+        view_preamble  => $opts{view_preamble},
     };
     bless $self, $class;
 }
@@ -118,11 +118,10 @@ Whether to view the log instead of add to it
 =cut
 
 method run(%opts) {
-    unless (-d $self->{logdir}) {
-        make_path($self->{logdir});
-    }
+    make_path $self->{logdir} unless -d $self->{logdir};
 
     if ($opts{view}) {
+        require IO::Pager;
         my $year  = $self->{date}->year;
         my $month = $self->{date}->month;
         my $day   = $self->{date}->day;
@@ -135,7 +134,7 @@ method run(%opts) {
             die "No log for $year/$month/$day\n" unless -e "$self->{logdir}/$year/$month/$day";
         };
         local $STDOUT = IO::Pager->new(*STDOUT);
-        say 'View online at http://hashbang.ca/~mike/sysadmin-log';
+        say $self->{view_preamble} if defined $self->{view_preamble};
         while (<$logfh>) {
             print;
         }
@@ -175,8 +174,10 @@ method run(%opts) {
 }
 
 method _generate_index() {
+    require File::Find::Rule;
+
     open my $indexfh, '>', "$self->{logdir}/index.log"; # clobbers the file
-    print $indexfh $self->{preamble};
+    say $indexfh $self->{index_preamble} if defined $self->{index_preamble};
 
     # Find relevant log files
     my @files = File::Find::Rule->mindepth(3)->in($self->{logdir});

@@ -11,7 +11,7 @@ my %opts = (
     user    => 'mike',
 );
 $opts{logdir} = "/home/$opts{user}/sysadmin-log";
-$opts{preamble} = <<'END';
+$opts{index_preamble} = <<'END';
 INDEX
 =====
 
@@ -26,6 +26,7 @@ since logging is often due to issues with those.
 * Shell access is required to log, so there probably aren't bogus
 log entries.
 END
+$opts{view_preamble} = 'View online at http://hashbang.ca/~mike/sysadmin-log';
 
 GetOptions( \%opts,
     'help|?',
