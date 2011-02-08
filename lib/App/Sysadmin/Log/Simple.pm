@@ -127,7 +127,13 @@ method run(%opts) {
         my $month = $self->{date}->month;
         my $day   = $self->{date}->day;
 
-        open my $logfh, '<', "$self->{logdir}/$year/$month/$day.log";
+        my $logfh;
+        try {
+            open $logfh, '<', "$self->{logdir}/$year/$month/$day.log";
+        }
+        catch {
+            die "No log for $year/$month/$day\n" unless -e "$self->{logdir}/$year/$month/$day";
+        };
         local $STDOUT = IO::Pager->new(*STDOUT);
         say 'View online at http://hashbang.ca/~mike/sysadmin-log';
         while (<$logfh>) {
