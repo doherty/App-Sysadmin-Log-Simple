@@ -168,7 +168,7 @@ method run(%opts) {
         open my $logfh, '>>', $logfile;
         my $timestamp = $self->{date}->hms;
         my $user = $ENV{SUDO_USER} || $ENV{USER}; # We need to know who wrote this
-        print $logfh  "$timestamp $user:\t$logentry";
+        print $logfh "    $timestamp $user:\t$logentry";
 
         # This might be run as root, so fix up ownership and
         # permissions so mortals can log to files root started
