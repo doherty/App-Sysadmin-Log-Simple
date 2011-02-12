@@ -38,10 +38,10 @@ GetOptions( \%opts,
     'user:s',
     'refresh-index',
     'udp!',
-);
+) or exit;
 
 my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
-GetOptions( 'udp-data=s' => \%udp_data);
+GetOptions( 'udp-data=s' => \%udp_data) or exit;
 $opts{udp} = \%udp_data if $opts{udp};
 
 =head1 SYNOPSIS
