@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     'File::Path' => '2.00',
     'Getopt::Long' => '0',
     'IO::Pager' => '0',
+    'IO::Socket' => '0',
     'Pod::Usage' => '0',
     'perl5i::2' => '0'
   },

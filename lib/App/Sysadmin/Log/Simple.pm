@@ -4,7 +4,6 @@ package App::Sysadmin::Log::Simple;
 use perl5i::2;
 use File::Path 2.00 qw(make_path);
 
-
 =head1 SYNOPSIS
 
     require App::Sysadmin::Log::Simple;
@@ -169,6 +168,48 @@ method run(%opts) {
         my $timestamp = $self->{date}->hms;
         my $user = $ENV{SUDO_USER} || $ENV{USER}; # We need to know who wrote this
         print $logfh "    $timestamp $user:\t$logentry";
+
+        if ($opts{udp}) {
+            require IO::Socket;
+            my $sock = IO::Socket::INET->new(
+                Proto       => 'udp',
+                PeerAddr    => ($opts{udp}->{host} || 'localhost'),
+                PeerPort    => $opts{udp}->{port},
+            );
+
+            if ($opts{udp}->{irc}) {
+                my %irc = (
+                    normal      => "\x0F",
+                    bold        => "\x02",
+                    underline   => "\x1F",
+                    white       => "\x0300",
+                    black       => "\x0301",
+                    blue        => "\x0302",
+                    green       => "\x0303",
+                    lightred    => "\x0304",
+                    red         => "\x0305",
+                    purple      => "\x0306",
+                    orange      => "\x0307",
+                    yellow      => "\x0308",
+                    lightgreen  => "\x0309",
+                    cyan        => "\x0310",
+                    lightcyan   => "\x0311",
+                    lightblue   => "\x0312",
+                    lightpurple => "\x0313",
+                    grey        => "\x0314",
+                    lightgrey   => "\x0315",
+                );
+
+                my $ircline = $irc{bold} . $irc{green} . '(LOG)' . $irc{normal} . ' '
+                    . $irc{underline} . $irc{lightblue} . $user . $irc{normal} . ': '
+                    . $logentry;
+                send($sock, $ircline, 0);
+            }
+            else {
+                send($sock, "(LOG) $user: $logentry", 0);
+            }
+            $sock->close;
+        }
 
         # This might be run as root, so fix up ownership and
         # permissions so mortals can log to files root started
