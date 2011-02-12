@@ -90,7 +90,7 @@ If true, use --udp-data to specify where to send the data.
 
 =item B<--udp-data>
 
-Sets data related to UDP:
+Sets data related to UDP. Specify a single key-value pair:
 
 =over 4
 
@@ -101,6 +101,10 @@ Sets data related to UDP:
 =item * port - the port to send to - default is 9002
 
 =back
+
+Use it multiple times to set multiple key-value pairs:
+
+    log --udp-data host=localhost --udp-data port=9002
 
 =item B<--refresh-index>
 
@@ -128,6 +132,32 @@ if ($opts{version}) {
 }
 
 =back
+
+=head1 EXAMPLES
+
+B<log>
+
+Add something to today's log.
+
+B<log --view --date 2011/01/01>
+
+View the log for January 1, 2011, if it exists.
+
+B<log --no-udp>
+
+Don't send a UDP datagram while adding to today's log
+
+B<log --refresh-index>
+
+Re-generate the index page for the logs.
+
+B<log --udp-data host=192.168.0.3 --udp-data port=5001>
+
+Send the UDP datagram somewhere other than the default.
+
+B<log --udp-data irc=0>
+
+Don't apply IRC colouring to the log data send via UDP.
 
 =cut
 
