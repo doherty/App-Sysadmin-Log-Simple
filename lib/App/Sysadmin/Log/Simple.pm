@@ -1,7 +1,7 @@
 package App::Sysadmin::Log::Simple;
 # ABSTRACT: application class for managing a simple sysadmin log
-
 use perl5i::2;
+# VERSION
 use File::Path 2.00 qw(make_path);
 
 =head1 SYNOPSIS

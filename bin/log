@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 package log;
 # ABSTRACT: maintain a single-host system administration log
-
 use perl5i::2;
+# VERSION
 use Getopt::Long;
 use Pod::Usage;
 require App::Sysadmin::Log::Simple;
