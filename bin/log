@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 package log;
 # ABSTRACT: maintain a single-host system administration log
-use perl5i::2;
 # VERSION
+use perl5i::2;
 use Getopt::Long;
 use Pod::Usage;
 require App::Sysadmin::Log::Simple;
@@ -35,7 +35,6 @@ GetOptions( \%opts,
     'view',
     'date:s',
     'logdir:s',
-    'user:s',
     'refresh-index',
     'udp!',
 ) or exit;
@@ -161,4 +160,7 @@ Don't apply IRC colouring to the log data send via UDP.
 
 =cut
 
-App::Sysadmin::Log::Simple->new(%opts)->run(%opts);
+my $mode = delete $opts{view}
+    ? 'view'
+    : delete $opts{'refresh-index'} ? 'refresh-index' : 'log';
+App::Sysadmin::Log::Simple->new(%opts)->run($mode);
