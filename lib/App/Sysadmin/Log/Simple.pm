@@ -221,6 +221,7 @@ method _generate_index() {
             say $indexfh "[$day]($year/$month/$day)"
         }
     }
+    return 1;
 }
 
 method _add_to_log() {
