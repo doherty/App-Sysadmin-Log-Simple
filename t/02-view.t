@@ -6,7 +6,6 @@ require App::Sysadmin::Log::Simple;
 
 my $log = App::Sysadmin::Log::Simple->new(
     logdir  => 't/log',
-    user    => $ENV{USER},
     date    => '2011/02/19',
 );
 

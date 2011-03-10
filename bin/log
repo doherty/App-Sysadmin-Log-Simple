@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package log;
+# PODNAME: log
 # ABSTRACT: maintain a single-host system administration log
 # VERSION
 use perl5i::2;
@@ -80,7 +80,7 @@ View a log instead of adding to it.
 
 =item B<--logdir>
 
-Sets the log directory to use - defaults to F</home/mike/sysadmin-log>.
+Sets the log directory to use - defaults to F</var/log/sysadmin>.
 
 =item B<--udp>, --no-udp
 
@@ -163,6 +163,7 @@ Don't apply IRC colouring to the log data send via UDP.
 my $mode = delete $opts{view}
     ? 'view'
     : delete $opts{'refresh-index'} ? 'refresh-index' : 'log';
+
 $opts{read_from} = \*STDIN;
 
 App::Sysadmin::Log::Simple->new(%opts)->run($mode);

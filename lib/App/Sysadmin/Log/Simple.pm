@@ -59,74 +59,48 @@ a git repository for additional tracking.
 Obviously, the constructor returns an C<App::Sysadmin::Log::Simple>
 object. It takes a hash of options which specify:
 
-=over 4
+=head3 logdir
 
-=item * B<mode>
+The directory where to find the sysadmin log. Defaults to
+F</var/log/sysadmin>.
 
-Mode is one of 'log' (the default), 'view', or 'generate-index'; this
-specifies what mode to run App::Sysadmin::Log::Simple in:
-
-=over 4
-
-=item log - add to a log file
-
-=item view - view a log file
-
-=item generate-index - re-build the index page
-
-=back
-
-=item * B<logdir>
-
-The directory where to find the sysadmin log.
-
-=item * B<user>
+=head3 user
 
 The user who owns the sysadmin log. Should be unprivileged,
-but could be anything.
+but could be anything. Defaults to the current user.
 
-=item * B<preamble>
+=head3 date
+
+The date to use instead of today.
+
+=head3 udp
+
+A hashref of data regarding UDP usage. If you don't want to
+send a UDP datagram, omit this. Otherwise, it has the following
+structure:
+
+    my %udp_data = (
+        irc => 1,           # Whether to insert IRC colour codes
+        host => 'localhost',# What hostname to send to
+        port => 9002,       # What port to send to
+    );
+
+=head3 index_preamble
 
 The text to prepend to the index page. Can be anything - by
 default, it is a short explanation of the rationale for using
 this system of logging, which probably won't make sense
 for your context.
 
-=item * date (optional)
+=head3 view_preamble
 
-The date to use instead of today.
+A string which gets prepended to the log being viewed (ie. at
+the top of the log file).
 
-=item * udp
+=head3 read_from
 
-A hashref of data regarding UDP usage. If you don't want to
-send a UDP datagram, omit this. Otherwise, it has the following
-structure:
-
-    my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
-
-=over 4
-
-=item irc - whether to insert IRC colour codes
-
-=item port - what port to send to
-
-=item host - what hostname to send to
-
-=back
-
-=item * index_preamble
-
-=item * view_preamble
-
-These are both strings which are prepended to the index page (ie. above
-the actual index), or the log being viewed (ie. at the top of the log
-file).
-
-=item * read_from
-
-A filehandle reference to read from to get the log data. Defaults to STDIN.
-
-=back
+An opened filehandle reference to read from to get the log entry.
+Defaults to C<STDIN>.
 
 =cut
 
@@ -145,7 +119,7 @@ method new($class: %opts) {
     my $self = {
         date    => $datetimeobj,
         logdir  => $opts{logdir} || '/var/log/sysadmin',
-        user    => $opts{user},
+        user    => $opts{user} || $ENV{USER},
         udp     => $opts{udp},
         index_preamble => $opts{index_preamble},
         view_preamble  => $opts{view_preamble},
@@ -156,15 +130,7 @@ method new($class: %opts) {
 
 =head2 run
 
-This runs the application with the options specified in a hash:
-
-=over 4
-
-=item * view (optional)
-
-Whether to view the log instead of add to it
-
-=back
+This runs the application in the specified mode: view or log (default).
 
 =cut
 
