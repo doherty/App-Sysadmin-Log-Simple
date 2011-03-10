@@ -14,7 +14,7 @@ my $tmplog = '--logdir ' . $test->workdir;
 my $rand = rand;
 
 $test->run(
-    args    => "--date 2011/02/19 $tmplog",
+    args    => "--date 2011/02/19 --no-udp $tmplog",
     stdin   => $rand,
 );
 is($?, 0, 'Log OK');
