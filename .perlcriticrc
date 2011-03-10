@@ -1,0 +1,8 @@
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = perl5i::2
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = perl5i::2
+
+# Ridiculous
+[-Compatibility::ProhibitThreeArgumentOpen]
