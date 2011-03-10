@@ -163,4 +163,6 @@ Don't apply IRC colouring to the log data send via UDP.
 my $mode = delete $opts{view}
     ? 'view'
     : delete $opts{'refresh-index'} ? 'refresh-index' : 'log';
+$opts{read_from} = \*STDIN;
+
 App::Sysadmin::Log::Simple->new(%opts)->run($mode);

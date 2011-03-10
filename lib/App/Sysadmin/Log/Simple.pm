@@ -122,6 +122,10 @@ These are both strings which are prepended to the index page (ie. above
 the actual index), or the log being viewed (ie. at the top of the log
 file).
 
+=item * read_from
+
+A filehandle reference to read from to get the log data. Defaults to STDIN.
+
 =back
 
 =cut
@@ -145,6 +149,7 @@ method new($class: %opts) {
         udp     => $opts{udp},
         index_preamble => $opts{index_preamble},
         view_preamble  => $opts{view_preamble},
+        in             => $opts{read_from} || \*STDIN,
     };
     bless $self, $class;
 }
@@ -234,7 +239,8 @@ method _add_to_log() {
 
     # Grab the entry and log it
     say 'Log entry:';
-    my $logentry = <STDIN>;
+    my $in = $self->{in};
+    my $logentry = <$in>;
     # Start a new log file if one doesn't exist already
     unless (-e $logfile) {
         open my $logfh, '>>', $logfile;
