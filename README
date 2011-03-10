@@ -7,7 +7,7 @@ VERSION
 
 SYNOPSIS
         require App::Sysadmin::Log::Simple;
-        App::Sysadmin::Log::Simple->new(logdir => '/tmp/my/logdir')->run({});
+        App::Sysadmin::Log::Simple->new(logdir => '/var/log/sysadmin')->run();
 
 DESCRIPTION
     "App::Sysadmin::Log::Simple" provides an easy way to maintain a simple
@@ -25,6 +25,10 @@ DESCRIPTION
     with Text::Markdown (or Text::MultiMarkdown, which is a more modern
     drop-in replacement) and served on the web.
 
+    If you need more than a single line of text, you may wish to use that
+    line to point to a pastebin - you can easily create and retrieve them
+    from the command line with App::Pastebin::sprunge.
+
     There is also no way to audit that the logs are correct. It can be
     incorrect in a number of ways:
 
@@ -40,37 +44,50 @@ DESCRIPTION
     Nonetheless, this is a simple, easy, and fast way to get a useful script
     for managing a simple sysadmin log. We believe the 80/20 rule applies:
     You can get 80% of the functionality with only 20% of a "real" solution.
+    In the future, each log entry might be committed to a git repository for
+    additional tracking.
 
 METHODS
   new
     Obviously, the constructor returns an "App::Sysadmin::Log::Simple"
     object. It takes a hash of options which specify:
 
-    *   logdir
+   logdir
+    The directory where to find the sysadmin log. Defaults to
+    /var/log/sysadmin.
 
-        The directory where to find the sysadmin log.
+   user
+    The user who owns the sysadmin log. Should be unprivileged, but could be
+    anything. Defaults to the current user.
 
-    *   user
+   date
+    The date to use instead of today.
 
-        The user who owns the sysadmin log. Should be unprivileged, but
-        could be anything.
+   udp
+    A hashref of data regarding UDP usage. If you don't want to send a UDP
+    datagram, omit this. Otherwise, it has the following structure:
 
-    *   preamble
+        my %udp_data = (
+            irc => 1,           # Whether to insert IRC colour codes
+            host => 'localhost',# What hostname to send to
+            port => 9002,       # What port to send to
+        );
 
-        The text to prepend to the index page. Can be anything - by default,
-        it is a short explanation of the rationale for using this system of
-        logging, which probably won't make sense for your context.
+   index_preamble
+    The text to prepend to the index page. Can be anything - by default, it
+    is a short explanation of the rationale for using this system of
+    logging, which probably won't make sense for your context.
 
-    *   date (optional)
+   view_preamble
+    A string which gets prepended to the log being viewed (ie. at the top of
+    the log file).
 
-        The date to use instead of today.
+   read_from
+    An opened filehandle reference to read from to get the log entry.
+    Defaults to "STDIN".
 
   run
-    This runs the application with the options specified in a hash:
-
-    *   view (optional)
-
-        Whether to view the log instead of add to it
+    This runs the application in the specified mode: view or log (default).
 
 AVAILABILITY
     The latest version of this module is available from the Comprehensive

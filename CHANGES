@@ -1,4 +1,6 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+
+0.001     2011-03-09
     * Initial release
