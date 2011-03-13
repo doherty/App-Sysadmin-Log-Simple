@@ -1,29 +1,36 @@
 use strict;
 use warnings;
-use Test::Cmd;
 use Test::More tests => 2;
-
-my $test = Test::Cmd->new(
-    prog    => './bin/log',
-    workdir => '',
-    # verbose => 1,
-    interpreter => 'perl -Ilib',
-);
-my $tmplog = '--logdir ' . $test->workdir;
+use Test::Output;
+use IO::Scalar;
+require App::Sysadmin::Log::Simple;
 
 my $rand = rand;
+my $logentry = new IO::Scalar \$rand;
 
-$test->run(
-    args    => "--date 2011/02/19 --no-udp $tmplog",
-    stdin   => $rand,
+my $app = App::Sysadmin::Log::Simple->new(
+    logdir  => 't/log',
+    date    => '2011/02/19',
+    read_from => $logentry,
 );
-is($?, 0, 'Log OK');
 
-$test->run(
-    args    => "--view --date 2011/02/19 $tmplog",
+ok($app->run(), 'App ran OK (log)');
+
+stdout_like(
+    sub { $app->run('view') },
+    qr/\Q$rand\E/,
+    "$rand appeared in the log"
 );
-like($test->stdout, qr/\Q$rand\E/, 'Old log data is there');
 
 END {
-    $test->cleanup;
+    open my $log, '>', 't/log/2011/2/19.log' or die "Couldn't open file for writing: $!";
+    print $log $_ while (<DATA>);
+    close $log;
 }
+
+__DATA__
+Saturday February 19, 2011
+==========================
+
+    14:36:49 mike:	hello
+    14:38:14 mike:	hello
