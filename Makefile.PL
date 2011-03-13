@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   'BUILD_REQUIRES' => {
     'File::Find' => '0',
     'File::Temp' => '0',
-    'Test::Cmd' => '0',
+    'IO::Scalar' => '0',
     'Test::More' => '0',
     'Test::Output' => '0'
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     'Pod::Usage' => '0',
     'perl5i::2' => '0'
   },
-  'VERSION' => '0.001',
+  'VERSION' => '0.002',
   'test' => {
     'TESTS' => 't/*.t'
   }

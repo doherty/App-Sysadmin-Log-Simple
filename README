@@ -3,7 +3,7 @@ NAME
     sysadmin log
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
         require App::Sysadmin::Log::Simple;
