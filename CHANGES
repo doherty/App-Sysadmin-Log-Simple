@@ -1,6 +1,7 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+    * Increase minimum version of File::Path required to 2.07 for make_path()
 
 0.002     2011-03-12
     * Rewrite test - will hopefully resolve smoke testers failure reports
