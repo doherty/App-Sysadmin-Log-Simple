@@ -29,14 +29,14 @@ my %WriteMakefileArgs = (
   'NAME' => 'App::Sysadmin::Log::Simple',
   'PREREQ_PM' => {
     'File::Find::Rule' => '0',
-    'File::Path' => '2.00',
+    'File::Path' => '2.07',
     'Getopt::Long' => '0',
     'IO::Pager' => '0',
     'IO::Socket' => '0',
     'Pod::Usage' => '0',
     'perl5i::2' => '0'
   },
-  'VERSION' => '0.002',
+  'VERSION' => '0.003',
   'test' => {
     'TESTS' => 't/*.t'
   }
