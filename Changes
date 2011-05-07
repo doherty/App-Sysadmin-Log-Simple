@@ -1,6 +1,7 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+    * Major rewrite, including the beginnings of a pluggable architecture
 
 0.003     2011-03-20
     * Increase minimum version of File::Path required to 2.07 for make_path()
