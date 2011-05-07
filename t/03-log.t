@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 5;
 use Test::Output;
 use IO::Scalar;
 require App::Sysadmin::Log::Simple;
@@ -8,13 +8,17 @@ require App::Sysadmin::Log::Simple;
 my $rand = rand;
 my $logentry = new IO::Scalar \$rand;
 
-my $app = App::Sysadmin::Log::Simple->new(
+my $app = new_ok('App::Sysadmin::Log::Simple' => [
     logdir  => 't/log',
     date    => '2011/02/19',
     read_from => $logentry,
-);
+]);
 
-ok($app->run(), 'App ran OK (log)');
+stdout_is(
+    sub { $app->run() },
+    "Log entry:\n",
+    'Got the log prompt'
+);
 
 stdout_like(
     sub { $app->run('view') },
@@ -22,8 +26,15 @@ stdout_like(
     "$rand appeared in the log"
 );
 
+stdout_is(
+    sub { eval { $app->run() } },
+    "Log entry:\n",
+    'Log entry requested'
+);
+like $@, qr/A log entry is needed/, 'Logging with no entry is fatal';
+
 END {
-    open my $log, '>', 't/log/2011/2/19.log' or die "Couldn't open file for writing: $!";
+    open my $log, '>', 't/log/2011/2/19.log' or warn "Couldn't open file for writing: $!";
     print $log $_ while (<DATA>);
     close $log;
 }

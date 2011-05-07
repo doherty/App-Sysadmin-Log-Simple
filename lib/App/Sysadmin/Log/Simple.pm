@@ -2,12 +2,14 @@ package App::Sysadmin::Log::Simple;
 # ABSTRACT: application class for managing a simple sysadmin log
 # VERSION
 use perl5i::2;
-use File::Path 2.07 qw(make_path);
+use Module::Pluggable
+    search_path => [__PACKAGE__],
+    instantiate => 'new';
 
 =head1 SYNOPSIS
 
     require App::Sysadmin::Log::Simple;
-    App::Sysadmin::Log::Simple->new(logdir => '/var/log/sysadmin')->run();
+    App::Sysadmin::Log::Simple->new()->run();
 
 =head1 DESCRIPTION
 
@@ -107,7 +109,7 @@ Defaults to C<STDIN>.
 method new($class: %opts) {
     my $datetimeobj = localtime;
     if ($opts{date}) {
-        my ($in_year, $in_month, $in_day) = split(/\//, $opts{date});
+        my ($in_year, $in_month, $in_day) = split(m{/}, $opts{date});
         my $in_date = DateTime->new(
             year  => $in_year,
             month => $in_month,
@@ -117,13 +119,11 @@ method new($class: %opts) {
         $datetimeobj = $in_date;
     }
     my $self = {
+        logdir  => $opts{logdir},
         date    => $datetimeobj,
-        logdir  => $opts{logdir} || '/var/log/sysadmin',
-        user    => $opts{user} || $ENV{USER},
+        user    => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
+        in      => $opts{read_from} || \*STDIN,
         udp     => $opts{udp},
-        index_preamble => $opts{index_preamble},
-        view_preamble  => $opts{view_preamble},
-        in             => $opts{read_from} || \*STDIN,
     };
     bless $self, $class;
 }
@@ -134,165 +134,35 @@ This runs the application in the specified mode: view or log (default).
 
 =cut
 
-method run($mode) {
-    make_path $self->{logdir} unless -d $self->{logdir};
-
-    try {
-        given ($mode) {
-            when ('refresh-index') {
-                say 'Refreshing index...';
-                $self->_generate_index() and say 'Done.';
-            }
-            when ('view') { $self->_view_log();   }
-            when ('log')  { $self->_add_to_log(); }
-            default       { $self->_add_to_log(); }
-        }
-    }
-    catch {
-        die $_;
-    };
-    return 1;
+method run($cmd) {
+    $cmd ||= 'log';
+    $self->run_command($cmd);
+    return;
 }
 
-method _generate_index() {
-    require File::Find::Rule;
-
-    open my $indexfh, '>', "$self->{logdir}/index.log"; # clobbers the file
-    say $indexfh $self->{index_preamble} if defined $self->{index_preamble};
-
-    # Find relevant log files
-    my @files = File::Find::Rule->mindepth(3)->in($self->{logdir});
-    my @dates;
-    foreach (@files) {
-        if (m!(\d{4}/\d{1,2}/\d{1,2})!) { # Extract the date
-            my $date = $1;
-            my ($year, $month, $day) = split /\//, $date;
-            push @dates, [$year, $month, $day];
-        }
-        else {
-            warn "WTF: $_";
-        }
-    }
-    # Sort by year, then by month, then by day
-    @dates = sort { ($b->[0]*10000 + $b->[1]*100 + $b->[2]) <=> ($a->[0]*10000 + $a->[1]*100 + $a->[2]) } @dates;
-    
-    # Keep track of 
-    my $lastyear  = 0;
-    my $lastmonth = 0;
-    for my $date (@dates) {
-        my $year  = $date->[0];
-        my $month = $date->[1];
-        my $day   = $date->[2];
-
-        if ($year != $lastyear) {
-            say $indexfh "\n$year";
-            say $indexfh "-" x length($year);
-            $lastyear  = $year;
-            $lastmonth = 0;
-        }
-        if ($month != $lastmonth) {
-            say $indexfh "\n### $month ###\n";
-            $lastmonth = $month;
-        }
-        if ($year == $lastyear and $month == $lastmonth) {
-            say $indexfh "[$day]($year/$month/$day)"
-        }
-    }
+method run_command($cmd) {
+    my $s = $self->can("run_command_$cmd");
+    die "Unknown command '$cmd'" unless $s;
+    $self->$s();
+    return;
 }
 
-method _add_to_log() {
-    my $year  = $self->{date}->year;
-    my $month = $self->{date}->month;
-    my $day   = $self->{date}->day;
-
-    make_path "$self->{logdir}/$year/$month" unless -d "$self->{logdir}/$year/$month";
-    my $logfile = "$self->{logdir}/$year/$month/$day.log";
-
-    # Grab the entry and log it
+method run_command_log() {
     say 'Log entry:';
     my $in = $self->{in};
-    my $logentry = <$in>;
+    my $logentry = <$in>; # one line
     croak 'A log entry is needed' unless $logentry;
-    # Start a new log file if one doesn't exist already
-    unless (-e $logfile) {
-        open my $logfh, '>>', $logfile;
-        my $line = $self->{date}->day_name . ' ' . $self->{date}->month_name . " $day, $year";
-        say $logfh $line;
-        say $logfh "=" x length($line), "\n";
-        close $logfh; # Explicitly close before calling generate_index() so the file is found
-        $self->_generate_index();
+    chomp $logentry;
+
+    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) {
+        next PLUGIN unless $plugin->can('log');
+        $plugin->log($logentry);
     }
-
-    open my $logfh, '>>', $logfile;
-    my $timestamp = $self->{date}->hms;
-    my $user = $ENV{SUDO_USER} || $ENV{USER}; # We need to know who wrote this
-    print $logfh "    $timestamp $user:\t$logentry";
-
-    $self->_to_udp($user, $logentry) if $self->{udp};
-
-    # This might be run as root, so fix up ownership and
-    # permissions so mortals can log to files root started
-    my ($login, $pass, $uid, $gid) = getpwnam($self->{user});
-    chown $uid, $gid, $logfile;
-    chmod 0644, $logfile;
 }
 
-method _to_udp($user, $logentry) {
-    require IO::Socket;
-    my $sock = IO::Socket::INET->new(
-        Proto       => 'udp',
-        PeerAddr    => ($self->{udp}->{host} || 'localhost'),
-        PeerPort    => $self->{udp}->{port},
-    );
-
-    if ($self->{udp}->{irc}) {
-        my %irc = (
-            normal      => "\x0F",
-            bold        => "\x02",
-            underline   => "\x1F",
-            white       => "\x0300",
-            black       => "\x0301",
-            blue        => "\x0302",
-            green       => "\x0303",
-            lightred    => "\x0304",
-            red         => "\x0305",
-            purple      => "\x0306",
-            orange      => "\x0307",
-            yellow      => "\x0308",
-            lightgreen  => "\x0309",
-            cyan        => "\x0310",
-            lightcyan   => "\x0311",
-            lightblue   => "\x0312",
-            lightpurple => "\x0313",
-            grey        => "\x0314",
-            lightgrey   => "\x0315",
-        );
-
-        my $ircline = $irc{bold} . $irc{green} . '(LOG)' . $irc{normal} . ' '
-            . $irc{underline} . $irc{lightblue} . $user . $irc{normal} . ': '
-            . $logentry;
-        send($sock, $ircline, 0);
+method run_command_view() {
+    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) { # Does this even make sense?
+        next PLUGIN unless $plugin->can('view');
+        $plugin->view();
     }
-    else {
-        send($sock, "(LOG) $user: $logentry", 0);
-    }
-    $sock->close;
-}
-
-method _view_log() {
-    require IO::Pager;
-    my $year  = $self->{date}->year;
-    my $month = $self->{date}->month;
-    my $day   = $self->{date}->day;
-
-    my $logfh;
-    try {
-        open $logfh, '<', "$self->{logdir}/$year/$month/$day.log";
-    }
-    catch {
-        die "No log for $year/$month/$day\n" unless -e "$self->{logdir}/$year/$month/$day";
-    };
-    local $STDOUT = IO::Pager->new(*STDOUT);
-    say $self->{view_preamble} if defined $self->{view_preamble};
-    print while (<$logfh>);
 }

@@ -5,13 +5,15 @@
 use perl5i::2;
 use Getopt::Long;
 use Pod::Usage;
+use File::HomeDir;
 require App::Sysadmin::Log::Simple;
 
 my %opts = (
-    user    => 'mike',
+    user    => $ENV{SUDO_USER} || $ENV{USER},
     udp     => 1,
 );
-$opts{logdir} = "/home/$opts{user}/sysadmin-log";
+my $HOME = File::HomeDir->users_home($opts{user});
+$opts{logdir} = "$HOME/sysadmin-log";
 $opts{index_preamble} = <<'END';
 INDEX
 =====
@@ -27,7 +29,6 @@ wiki, but is more reliable:
 * Shell access is required to log, so there probably aren't bogus
   log entries.
 END
-$opts{view_preamble} = 'View online at http://hashbang.ca/~mike/sysadmin-log';
 
 GetOptions( \%opts,
     'help|?',
