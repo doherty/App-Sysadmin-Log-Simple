@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN { require 5.006; }
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     'Test::Output' => '0'
   },
   'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+    'ExtUtils::MakeMaker' => '6.30'
   },
   'DISTNAME' => 'App-Sysadmin-Log-Simple',
   'EXE_FILES' => [
@@ -29,14 +29,16 @@ my %WriteMakefileArgs = (
   'NAME' => 'App::Sysadmin::Log::Simple',
   'PREREQ_PM' => {
     'File::Find::Rule' => '0',
+    'File::HomeDir' => '0',
     'File::Path' => '2.07',
     'Getopt::Long' => '0',
     'IO::Pager' => '0',
     'IO::Socket' => '0',
+    'Module::Pluggable' => '0',
     'Pod::Usage' => '0',
     'perl5i::2' => '0'
   },
-  'VERSION' => '0.003',
+  'VERSION' => '0.004',
   'test' => {
     'TESTS' => 't/*.t'
   }

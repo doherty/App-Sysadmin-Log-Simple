@@ -3,11 +3,11 @@ NAME
     sysadmin log
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
         require App::Sysadmin::Log::Simple;
-        App::Sysadmin::Log::Simple->new(logdir => '/var/log/sysadmin')->run();
+        App::Sysadmin::Log::Simple->new()->run();
 
 DESCRIPTION
     "App::Sysadmin::Log::Simple" provides an easy way to maintain a simple
@@ -90,6 +90,8 @@ METHODS
     This runs the application in the specified mode: view or log (default).
 
 AVAILABILITY
+    The project homepage is <http://p3rl.org/App::Sysadmin::Log::Simple>.
+
     The latest version of this module is available from the Comprehensive
     Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
     CPAN site near you, or see
@@ -110,7 +112,7 @@ BUGS AND LIMITATIONS
     No bugs have been reported.
 
     Please report any bugs or feature requests through the web interface at
-    <http://github.com/doherty/App-Sysadmin-Log-Simple/issues>.
+    <https://github.com/doherty/App-Sysadmin-Log-Simple/issues>.
 
 AUTHOR
     Mike Doherty <doherty@cpan.org>

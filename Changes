@@ -1,6 +1,8 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+
+0.004     2011-05-07
     * Major rewrite, including the beginnings of a pluggable architecture
 
 0.003     2011-03-20
