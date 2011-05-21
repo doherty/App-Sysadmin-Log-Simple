@@ -119,6 +119,7 @@ method new($class: %opts) {
         $datetimeobj = $in_date;
     }
     my $self = {
+        twitter => $opts{twitter},
         logdir  => $opts{logdir},
         date    => $datetimeobj,
         user    => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
@@ -161,7 +162,7 @@ method run_command_log() {
 }
 
 method run_command_view() {
-    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) { # Does this even make sense?
+    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) {
         next PLUGIN unless $plugin->can('view');
         $plugin->view();
     }

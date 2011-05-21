@@ -38,6 +38,7 @@ GetOptions( \%opts,
     'logdir:s',
     'refresh-index',
     'udp!',
+    'twitter!',
 ) or exit;
 
 my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
@@ -52,6 +53,7 @@ Options:
     B<--date>       Read from/write to a date other than today's
     B<--view>       View a log file instead of add to it
     B<--logdir>     Use a different log directory
+    B<--twitter>    Send your log entry to Twitter
     B<--no-udp>     Skip sending log data over UDP
     B<--udp-data>   Sets UDP data:
                         - whether to apply IRC colour encoding
@@ -82,6 +84,10 @@ View a log instead of adding to it.
 =item B<--logdir>
 
 Sets the log directory to use - defaults to F</var/log/sysadmin>.
+
+=item B<--twitter>, --no-twitter
+
+Whether to send your log entry to Twitter.
 
 =item B<--udp>, --no-udp
 
