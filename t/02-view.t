@@ -1,7 +1,5 @@
-use strict;
-use warnings;
+use perl5i::2;
 use Test::More tests => 1;
-use Test::Output;
 require App::Sysadmin::Log::Simple;
 
 my $log = App::Sysadmin::Log::Simple->new(
@@ -14,7 +12,8 @@ open my $testfh, '>', 't/log/2011/2/19.log' or die "Couldn't open for reading: $
 print $testfh $should;
 close $testfh or die "Couldn't close filehandle: $!";
 
-stdout_is(sub { $log->run('view') }, $should, 'Reads the file ok');
+my $stdout = capture { $log->run('view') };
+is $stdout, $should, 'Reads the file ok';
 
 __DATA__
 Saturday February 19, 2011

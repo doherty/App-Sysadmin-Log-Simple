@@ -1,7 +1,6 @@
 use perl5i::2;
 use File::Temp;
-use Test::More tests => 4;
-use Test::Output;
+use Test::More tests => 5;
 use IO::Scalar;
 require App::Sysadmin::Log::Simple;
 
@@ -18,11 +17,9 @@ my $log = new_ok('App::Sysadmin::Log::Simple' => [
 ]);
 my $idx_old = do { local $/; open my $idxfh, '<', "t/log/index.log"; <$idxfh> };
 
-stdout_is(
-    sub { $log->run() }, # will read from $logentry
-    "Log entry:\n",
-    'log ok'
-);
+my ($stdout, $stderr) = capture { $log->run() }; # will read from $logentry
+like $stdout, qr/Log entry:/, 'log ok';
+is $stderr, '', 'No STDERR';
 
 my $idx_new = do { local $/; open my $idxfh, '<', "t/log/index.log"; <$idxfh> };
 

@@ -39,6 +39,8 @@ Whether to apply IRC colour codes or not.
 =cut
 
 method new($class: %opts) {
+    $opts{udp}->{host} ||= 'localhost';
+    $opts{udp}->{port} ||= 9002;
     return bless {
         udp  => $opts{udp},
         user => $opts{user},
@@ -56,8 +58,8 @@ method log($logentry) {
     require IO::Socket;
     my $sock = IO::Socket::INET->new(
         Proto       => 'udp',
-        PeerAddr    => $self->{udp}->{host} || 'localhost',
-        PeerPort    => $self->{udp}->{port} || 9002,
+        PeerAddr    => $self->{udp}->{host},
+        PeerPort    => $self->{udp}->{port},
     );
     carp "Couldn't get a socket: $!" unless $sock;
 
@@ -93,5 +95,6 @@ method log($logentry) {
         send($sock, "(LOG) $self->{user}: $logentry", 0);
     }
     $sock->close;
-    return;
+
+    return "Logged to $self->{udp}->{host}:$self->{udp}->{port}";
 }

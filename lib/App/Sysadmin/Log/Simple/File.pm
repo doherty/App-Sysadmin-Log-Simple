@@ -114,7 +114,8 @@ method log($line) {
     my ($login, $pass, $uid, $gid) = getpwnam($self->{user});
     chown $uid, $gid, $logfile;
     chmod 0644, $logfile;
-    return;
+
+    return "Logged to $logfile";
 }
 
 method _generate_index() {

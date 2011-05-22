@@ -157,7 +157,13 @@ method run_command_log() {
 
     PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) {
         next PLUGIN unless $plugin->can('log');
-        $plugin->log($logentry);
+        my $r = $plugin->log($logentry);
+        if ($r) {
+            my $name = $plugin->mo->class;
+            my $re = __PACKAGE__ . '::';
+            $name =~ s/^$re//;
+            say sprintf '[%-10s] %s', $name, $r;
+        }
     }
 }
 
