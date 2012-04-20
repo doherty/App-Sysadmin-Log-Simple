@@ -1,6 +1,9 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+    * Remove perl5i - too slow
+    * Make the UDP stuff work right
+    * Improve a few minor design decisions
 
 0.004     2011-05-07
     * Major rewrite, including the beginnings of a pluggable architecture

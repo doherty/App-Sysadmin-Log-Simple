@@ -1,5 +1,10 @@
 package App::Sysadmin::Log::Simple::UDP;
-use perl5i::2;
+use strict;
+use warnings;
+use Carp;
+use IO::Socket::INET;
+use autodie qw(:socket);
+
 # ABSTRACT: a UDP-logger for App::Sysadmin::Log::Simple
 # VERSION
 
@@ -38,12 +43,17 @@ Whether to apply IRC colour codes or not.
 
 =cut
 
-method new($class: %opts) {
-    $opts{udp}->{host} ||= 'localhost';
-    $opts{udp}->{port} ||= 9002;
+sub new {
+    my $class = shift;
+    my %opts  = @_;
+    my $app   = $opts{app};
+
+    $app->{udp}->{host} ||= 'localhost';
+    $app->{udp}->{port} ||= 9002;
+
     return bless {
-        udp  => $opts{udp},
-        user => $opts{user},
+        udp  => $app->{udp},
+        user => $app->{user},
     }, $class;
 }
 
@@ -54,8 +64,10 @@ colour codes to it.
 
 =cut
 
-method log($logentry) {
-    require IO::Socket;
+sub log {
+    my $self     = shift;
+    my $logentry = shift;
+
     my $sock = IO::Socket::INET->new(
         Proto       => 'udp',
         PeerAddr    => $self->{udp}->{host},
@@ -88,13 +100,15 @@ method log($logentry) {
 
         my $ircline = $irc{bold} . $irc{green} . '(LOG)' . $irc{normal}
             . ' ' . $irc{underline} . $irc{lightblue} . $self->{user} . $irc{normal}
-            . ': ' . $logentry;
-        send($sock, $ircline, 0);
+            . ': ' . $logentry . "\r\n";
+        print $sock $ircline;
     }
     else {
-        send($sock, "(LOG) $self->{user}: $logentry", 0);
+        print $sock "(LOG) $self->{user}: $logentry\r\n";
     }
-    $sock->close;
+    $sock->shutdown(2);
 
     return "Logged to $self->{udp}->{host}:$self->{udp}->{port}";
 }
+
+1;

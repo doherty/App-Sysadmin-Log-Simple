@@ -1,10 +1,16 @@
 package App::Sysadmin::Log::Simple;
-# ABSTRACT: application class for managing a simple sysadmin log
-# VERSION
-use perl5i::2;
+use strict;
+use warnings;
+use v5.10.1;
+use autodie qw(:file :filesys);
+use DateTime;
+use Carp;
 use Module::Pluggable
     search_path => [__PACKAGE__],
     instantiate => 'new';
+
+# ABSTRACT: application class for managing a simple sysadmin log
+# VERSION
 
 =head1 SYNOPSIS
 
@@ -106,8 +112,10 @@ Defaults to C<STDIN>.
 
 =cut
 
-method new($class: %opts) {
-    my $datetimeobj = localtime;
+sub new {
+    my $class = shift;
+    my %opts  = @_;
+    my $datetimeobj = DateTime->now;
     if ($opts{date}) {
         my ($in_year, $in_month, $in_day) = split(m{/}, $opts{date});
         my $in_date = DateTime->new(
@@ -118,15 +126,15 @@ method new($class: %opts) {
         croak "Cannot use a date in the future\n" if $in_date > $datetimeobj;
         $datetimeobj = $in_date;
     }
-    my $self = {
+
+    return bless {
         twitter => $opts{twitter},
         logdir  => $opts{logdir},
         date    => $datetimeobj,
         user    => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
         in      => $opts{read_from} || \*STDIN,
         udp     => $opts{udp},
-    };
-    bless $self, $class;
+    }, $class;
 }
 
 =head2 run
@@ -135,31 +143,37 @@ This runs the application in the specified mode: view or log (default).
 
 =cut
 
-method run($cmd) {
+sub run {
+    my $self = shift;
+    my $cmd  = shift;
+
     $cmd ||= 'log';
     $self->run_command($cmd);
     return;
 }
 
-method run_command($cmd) {
+sub run_command {
+    my $self = shift;
+    my $cmd  = shift;
+
     my $s = $self->can("run_command_$cmd");
     die "Unknown command '$cmd'" unless $s;
-    $self->$s();
-    return;
+    return $self->$s();
 }
 
-method run_command_log() {
+sub run_command_log {
+    my $self = shift;
     say 'Log entry:';
     my $in = $self->{in};
     my $logentry = <$in>; # one line
-    croak 'A log entry is needed' unless $logentry;
     chomp $logentry;
+    croak 'A log entry is needed' unless $logentry;
 
-    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) {
+    PLUGIN: foreach my $plugin ( $self->plugins(app => $self) ) {
         next PLUGIN unless $plugin->can('log');
         my $r = $plugin->log($logentry);
         if ($r) {
-            my $name = $plugin->mo->class;
+            my $name = ref $plugin;
             my $re = __PACKAGE__ . '::';
             $name =~ s/^$re//;
             say sprintf '[%-10s] %s', $name, $r;
@@ -167,9 +181,16 @@ method run_command_log() {
     }
 }
 
-method run_command_view() {
-    PLUGIN: foreach my $plugin ( $self->plugins(%$self) ) {
+sub run_command_view {
+    my $self = shift;
+    PLUGIN: foreach my $plugin ( $self->plugins(app => $self) ) {
         next PLUGIN unless $plugin->can('view');
         $plugin->view();
     }
 }
+
+=for Pod::Coverage run_command run_command_log run_command_view
+
+=cut
+
+1;

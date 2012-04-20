@@ -1,12 +1,15 @@
 #!/usr/bin/env perl
-# PODNAME: log
-# ABSTRACT: maintain a single-host system administration log
-# VERSION
-use perl5i::2;
+use strict;
+use warnings;
+use v5.10.1;
 use Getopt::Long;
 use Pod::Usage;
 use File::HomeDir;
-require App::Sysadmin::Log::Simple;
+use App::Sysadmin::Log::Simple;
+
+# PODNAME: log
+# ABSTRACT: maintain a single-host system administration log
+# VERSION
 
 my %opts = (
     user    => $ENV{SUDO_USER} || $ENV{USER},
@@ -133,8 +136,8 @@ View version data.
 =cut
 
 if ($opts{version}) {
-    say "$0 version " . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev')
-        and exit;
+    say "$0 version " . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev');
+    exit 0;
 }
 
 =back

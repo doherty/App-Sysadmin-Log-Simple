@@ -1,8 +1,12 @@
 package App::Sysadmin::Log::Simple::Twitter;
-use perl5i::2;
+use strict;
+use warnings;
+use autodie qw(:file :filesys);
+use File::Spec;
+use Config::General qw(ParseConfig);
+
 # ABSTRACT: a Twitter-logger for App::Sysadmin::Log::Simple
 # VERSION
-use Config::General qw(ParseConfig);
 
 =head1 DESCRIPTION
 
@@ -36,22 +40,26 @@ Or, you can provide a different location for the file:
 
 =cut
 
-method new($class: %opts) {
+sub new {
+    my $class = shift;
+    my %opts  = @_;
+    my $app   = $opts{app};
+
     my $oauth_file;
-    if ($opts{oauth_file}) {
-        $oauth_file = $opts{oauth_file};
+    if ($app->{oauth_file}) {
+        $oauth_file = $app->{oauth_file};
     }
     else {
         require File::HomeDir;
         my $HOME = File::HomeDir->users_home(
-            $opts{user} || $ENV{SUDO_USER} || $ENV{USER}
+            $app->{user} || $ENV{SUDO_USER} || $ENV{USER}
         );
-        $oauth_file = "$HOME/.sysadmin-log-twitter-oauth";
+        $oauth_file = File::Spec->catfile($HOME, '.sysadmin-log-twitter-oauth');
     }
 
     return bless {
         oauth_file  => $oauth_file,
-        twitter     => $opts{twitter},
+        twitter     => $app->{twitter},
     }, $class;
 }
 
@@ -61,14 +69,17 @@ This tweets your log message.
 
 =cut
 
-method log($logentry) {
+sub log {
+    my $self     = shift;
+    my $logentry = shift;
+
     return unless $self->{twitter};
 
     require Net::Twitter::Lite;
     
     my $stat = stat $self->{oauth_file};
     warn "You should do: chmod 600 $self->{oauth_file}\n"
-        if ($stat->mode & 07777) != 0600;
+        if ($stat->mode & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
     my $conf = Config::General->new($self->{oauth_file});
     my %oauth = $conf->getall();
 
@@ -90,3 +101,5 @@ method log($logentry) {
         . '/status/' . $result->{id_str};
     return "Posted to Twitter: $url";
 }
+
+1;
