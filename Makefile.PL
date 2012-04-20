@@ -2,45 +2,55 @@
 use strict;
 use warnings;
 
-BEGIN { require 5.006; }
+use 5.010001;
 
 use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'application class for managing a simple sysadmin log',
-  'AUTHOR' => 'Mike Doherty <doherty@cpan.org>',
-  'BUILD_REQUIRES' => {
-    'File::Find' => '0',
-    'File::Temp' => '0',
-    'IO::Scalar' => '0',
-    'Test::More' => '0',
-    'Test::Output' => '0'
+  "ABSTRACT" => "application class for managing a simple sysadmin log",
+  "AUTHOR" => "Mike Doherty <doherty\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "File::Find" => 0,
+    "File::Temp" => 0,
+    "IO::Scalar" => 0,
+    "Module::Build" => "0.3601",
+    "Test::More" => "0.96",
+    "Test::Output" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.30'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30",
+    "Module::Build" => "0.3601"
   },
-  'DISTNAME' => 'App-Sysadmin-Log-Simple',
-  'EXE_FILES' => [
-    'bin/log'
+  "DISTNAME" => "App-Sysadmin-Log-Simple",
+  "EXE_FILES" => [
+    "bin/log"
   ],
-  'LICENSE' => 'perl',
-  'NAME' => 'App::Sysadmin::Log::Simple',
-  'PREREQ_PM' => {
-    'File::Find::Rule' => '0',
-    'File::HomeDir' => '0',
-    'File::Path' => '2.07',
-    'Getopt::Long' => '0',
-    'IO::Pager' => '0',
-    'IO::Socket' => '0',
-    'Module::Pluggable' => '0',
-    'Pod::Usage' => '0',
-    'perl5i::2' => '0'
+  "LICENSE" => "perl",
+  "NAME" => "App::Sysadmin::Log::Simple",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Config::General" => 0,
+    "DateTime" => 0,
+    "File::Find::Rule" => 0,
+    "File::HomeDir" => 0,
+    "File::Path" => "2.07",
+    "Getopt::Long" => 0,
+    "IO::Pager" => 0,
+    "IO::Socket::INET" => 0,
+    "Module::Pluggable" => 0,
+    "Net::Twitter::Lite" => 0,
+    "Pod::Usage" => 0,
+    "Try::Tiny" => 0,
+    "autodie" => 0,
+    "perl5i::2" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  'VERSION' => '0.004',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.005",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 
