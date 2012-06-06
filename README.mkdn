@@ -35,7 +35,7 @@ from the command line with [App::Pastebin::sprunge](http://search.cpan.org/perld
 There is also no way to audit that the logs are correct. It can be
 incorrect in a number of ways:
 
-- SUDO_USER or USER can be spoofed
+- SUDO\_USER or USER can be spoofed
 - The files can be edited at any time, they are chmod 644 and
 owned by an unprivileged user
 - The timestamp depends on the system clock
@@ -80,19 +80,19 @@ structure:
         port => 9002,       # What port to send to
     );
 
-### index_preamble
+### index\_preamble
 
 The text to prepend to the index page. Can be anything - by
 default, it is a short explanation of the rationale for using
 this system of logging, which probably won't make sense
 for your context.
 
-### view_preamble
+### view\_preamble
 
 A string which gets prepended to the log being viewed (ie. at
 the top of the log file).
 
-### read_from
+### read\_from
 
 An opened filehandle reference to read from to get the log entry.
 Defaults to `STDIN`.
