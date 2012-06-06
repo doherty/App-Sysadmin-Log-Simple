@@ -12,8 +12,10 @@ use App::Sysadmin::Log::Simple;
 # VERSION
 
 my %opts = (
-    user    => $ENV{SUDO_USER} || $ENV{USER},
-    udp     => 1,
+    user        => $ENV{SUDO_USER} || $ENV{USER},
+    do_udp      => 1,
+    do_file     => 1,
+    do_twitter  => 0,
 );
 my $HOME = File::HomeDir->users_home($opts{user});
 $opts{logdir} = "$HOME/sysadmin-log";
@@ -42,11 +44,16 @@ GetOptions( \%opts,
     'refresh-index',
     'udp!',
     'twitter!',
+    'file!',
 ) or exit;
+
+$opts{do_udp}     = delete $opts{udp};
+$opts{do_file}    = delete $opts{file};
+$opts{do_twitter} = delete $opts{twitter};
 
 my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
 GetOptions( 'udp-data=s' => \%udp_data) or exit;
-$opts{udp} = \%udp_data if $opts{udp};
+$opts{udp} = \%udp_data if $opts{do_udp};
 
 =head1 SYNOPSIS
 
@@ -57,6 +64,7 @@ Options:
     B<--view>       View a log file instead of add to it
     B<--logdir>     Use a different log directory
     B<--twitter>    Send your log entry to Twitter
+    B<--no-file>    Skip logging to file
     B<--no-udp>     Skip sending log data over UDP
     B<--udp-data>   Sets UDP data:
                         - whether to apply IRC colour encoding
@@ -90,7 +98,11 @@ Sets the log directory to use - defaults to F</var/log/sysadmin>.
 
 =item B<--twitter>, --no-twitter
 
-Whether to send your log entry to Twitter.
+Whether to send your log entry to Twitter. Default is false.
+
+=item B<--file>, --no-file
+
+Whether to log to a file. Default is true.
 
 =item B<--udp>, --no-udp
 

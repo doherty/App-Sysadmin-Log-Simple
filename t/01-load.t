@@ -18,4 +18,4 @@ my $udp_logger = new_ok('App::Sysadmin::Log::Simple::UDP');
 can_ok($udp_logger, qw(new log));
 
 my $twitter_logger = new_ok('App::Sysadmin::Log::Simple::Twitter');
-can_ok($udp_logger, qw(new log));
+can_ok($twitter_logger, qw(new log));

@@ -58,6 +58,7 @@ sub new {
         view_preamble   => $app->{view_preamble},
         date            => $app->{date},
         user            => $app->{user},
+        do_file         => $app->{do_file},
     }, $class;
 }
 
@@ -102,6 +103,8 @@ the index file as necessary.
 sub log {
     my $self = shift;
     my $line = shift;
+
+    return unless $self->{do_file};
 
     make_path $self->{logdir} unless -d $self->{logdir};
 
@@ -163,7 +166,7 @@ sub _generate_index {
                 map  { [ $_, $_->[0]*1000 + $_->[1]*10 + $_->[2] ] }
                 @dates;
 
-    # Keep track of 
+    # Keep track of
     my $lastyear  = 0;
     my $lastmonth = 0;
     for my $date (@dates) {

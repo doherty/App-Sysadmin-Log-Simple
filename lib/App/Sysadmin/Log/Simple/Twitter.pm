@@ -2,7 +2,6 @@ package App::Sysadmin::Log::Simple::Twitter;
 use strict;
 use warnings;
 use autodie qw(:file :filesys);
-use File::Spec;
 use Config::General qw(ParseConfig);
 
 # ABSTRACT: a Twitter-logger for App::Sysadmin::Log::Simple
@@ -51,6 +50,8 @@ sub new {
     }
     else {
         require File::HomeDir;
+        require File::Spec;
+
         my $HOME = File::HomeDir->users_home(
             $app->{user} || $ENV{SUDO_USER} || $ENV{USER}
         );
@@ -59,7 +60,7 @@ sub new {
 
     return bless {
         oauth_file  => $oauth_file,
-        twitter     => $app->{twitter},
+        do_twitter  => $app->{do_twitter},
     }, $class;
 }
 
@@ -73,22 +74,22 @@ sub log {
     my $self     = shift;
     my $logentry = shift;
 
-    return unless $self->{twitter};
+    return unless $self->{do_twitter};
 
     require Net::Twitter::Lite;
-    
-    my $stat = stat $self->{oauth_file};
+
     warn "You should do: chmod 600 $self->{oauth_file}\n"
-        if ($stat->mode & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+        if ((stat $self->{oauth_file})[2] & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
     my $conf = Config::General->new($self->{oauth_file});
     my %oauth = $conf->getall();
 
     my $ua = __PACKAGE__
         . '/' . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev');
     my $t = Net::Twitter::Lite->new(
-        consumer_key    => $oauth{consumer_key},
-        consumer_secret => $oauth{consumer_secret},
-        useragent       => $ua,
+        consumer_key        => $oauth{consumer_key},
+        consumer_secret     => $oauth{consumer_secret},
+        useragent           => $ua,
+        legacy_lists_api    => 0
     );
     $t->access_token($oauth{oauth_token});
     $t->access_token_secret($oauth{oauth_token_secret});

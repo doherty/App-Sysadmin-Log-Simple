@@ -52,8 +52,9 @@ sub new {
     $app->{udp}->{port} ||= 9002;
 
     return bless {
-        udp  => $app->{udp},
-        user => $app->{user},
+        do_udp  => $app->{do_udp},
+        udp     => $app->{udp},
+        user    => $app->{user},
     }, $class;
 }
 
@@ -67,6 +68,8 @@ colour codes to it.
 sub log {
     my $self     = shift;
     my $logentry = shift;
+
+    return unless $self->{do_udp};
 
     my $sock = IO::Socket::INET->new(
         Proto       => 'udp',

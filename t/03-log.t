@@ -11,9 +11,9 @@ my $rand = rand;
 my $logentry = IO::Scalar->new(\$rand);
 $ENV{'App::Sysadmin::Log::Simple::File under test'} = 1;
 my $app = new_ok('App::Sysadmin::Log::Simple' => [
-    logdir  => 't/log',
-    date    => '2011/02/19',
-    read_from => $logentry,
+    logdir      => File::Spec->catdir(qw( t log )),
+    date        => '2011/02/19',
+    read_from   => $logentry,
 ]);
 
 subtest 'log' => sub {
@@ -42,8 +42,9 @@ subtest 'log-fail' => sub {
 };
 
 END {
-    open my $log, '>', File::Spec->catfile(qw( t log 2011 2 19.log));
-    print $log $_ while (<DATA>);
+    my $file = File::Spec->catfile(qw( t log 2011 2 19.log));
+    open my $log, '>', $file;
+    while (<DATA>) { chomp; print $log $_; }
     close $log;
 }
 

@@ -115,7 +115,7 @@ Defaults to C<STDIN>.
 sub new {
     my $class = shift;
     my %opts  = @_;
-    my $datetimeobj = DateTime->now;
+    my $today = DateTime->now;
     if ($opts{date}) {
         my ($in_year, $in_month, $in_day) = split(m{/}, $opts{date});
         my $in_date = DateTime->new(
@@ -123,17 +123,19 @@ sub new {
             month => $in_month,
             day   => $in_day,
         ) or croak "Couldn't understand your date - use YYYY/MM/DD\n";
-        croak "Cannot use a date in the future\n" if $in_date > $datetimeobj;
-        $datetimeobj = $in_date;
+        croak "Cannot use a date in the future\n" if $in_date > $today;
+        $today = $in_date;
     }
 
     return bless {
-        twitter => $opts{twitter},
-        logdir  => $opts{logdir},
-        date    => $datetimeobj,
-        user    => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
-        in      => $opts{read_from} || \*STDIN,
-        udp     => $opts{udp},
+        do_twitter  => $opts{do_twitter} // 0,
+        do_file     => $opts{do_file} // 1,
+        do_udp      => $opts{do_udp} // 1,
+        logdir      => $opts{logdir},
+        date        => $today,
+        user        => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
+        in          => $opts{read_from} || \*STDIN,
+        udp         => $opts{udp},
     }, $class;
 }
 
@@ -176,7 +178,7 @@ sub run_command_log {
             my $name = ref $plugin;
             my $re = __PACKAGE__ . '::';
             $name =~ s/^$re//;
-            say sprintf '[%-10s] %s', $name, $r;
+            say sprintf '[%-8s] %s', $name, $r;
         }
     }
 }
