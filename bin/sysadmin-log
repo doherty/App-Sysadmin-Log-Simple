@@ -15,6 +15,7 @@ my %opts = (
     user        => $ENV{SUDO_USER} || $ENV{USER},
     do_udp      => 1,
     do_file     => 1,
+    do_http     => 0,
     do_twitter  => 0,
 );
 my $HOME = File::HomeDir->users_home($opts{user});
@@ -45,10 +46,12 @@ GetOptions( \%opts,
     'udp!',
     'twitter!',
     'file!',
+    'http!',
 ) or exit;
 
 $opts{do_udp}     = delete $opts{udp};
 $opts{do_file}    = delete $opts{file};
+$opts{do_http}    = delete $opts{http};
 $opts{do_twitter} = delete $opts{twitter};
 
 my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
@@ -64,6 +67,7 @@ Options:
     B<--view>       View a log file instead of add to it
     B<--logdir>     Use a different log directory
     B<--twitter>    Send your log entry to Twitter
+    B<--http>       Send your log entry to Http
     B<--no-file>    Skip logging to file
     B<--no-udp>     Skip sending log data over UDP
     B<--udp-data>   Sets UDP data:
@@ -99,6 +103,10 @@ Sets the log directory to use - defaults to F</var/log/sysadmin>.
 =item B<--twitter>, --no-twitter
 
 Whether to send your log entry to Twitter. Default is false.
+
+=item B<--http>, --no-http
+
+Whether to send your log entry via HTTP. Default is false.
 
 =item B<--file>, --no-file
 

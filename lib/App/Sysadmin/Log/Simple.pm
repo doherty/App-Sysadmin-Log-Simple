@@ -130,6 +130,7 @@ sub new {
     return bless {
         do_twitter  => $opts{do_twitter} // 0,
         do_file     => $opts{do_file} // 1,
+        do_http     => $opts{do_http} // 0,
         do_udp      => $opts{do_udp} // 1,
         logdir      => $opts{logdir},
         date        => $today,
