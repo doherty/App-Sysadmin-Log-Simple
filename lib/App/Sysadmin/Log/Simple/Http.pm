@@ -76,7 +76,7 @@ sub log {
 
         my $uri = $self->{http}->{uri};
         $uri .= ($uri =~ m/\?/) ? '&' : '?';
-        $uri .= sprintf('user=%s&log=%s',$self->{user},$logentry); #FIXME these need to be escapted
+        $uri .= sprintf('user=%s&log=%s',$self->{user},$logentry); #FIXME these need to be escaped
 
         $res = $ua->get($uri);
 

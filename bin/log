@@ -58,6 +58,10 @@ my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
 GetOptions( 'udp-data=s' => \%udp_data) or exit;
 $opts{udp} = \%udp_data if $opts{do_udp};
 
+my %http_data = ( http => 1, method => 'post', uri => 'http://localhost' );
+GetOptions( 'http-data=s' => \%http_data) or exit;
+$opts{http} = \%http_data if $opts{do_http};
+
 =head1 SYNOPSIS
 
 B<log> [--date YYYY/MM/DD] [--view] [--version] [--help]
@@ -68,6 +72,9 @@ Options:
     B<--logdir>     Use a different log directory
     B<--twitter>    Send your log entry to Twitter
     B<--http>       Send your log entry to Http
+    B<--http-data>  Sets HTTP data:
+                        - method to send using
+                        - uri to send to
     B<--no-file>    Skip logging to file
     B<--no-udp>     Skip sending log data over UDP
     B<--udp-data>   Sets UDP data:
@@ -107,6 +114,22 @@ Whether to send your log entry to Twitter. Default is false.
 =item B<--http>, --no-http
 
 Whether to send your log entry via HTTP. Default is false.
+
+=item B<--http-data>
+
+Sets data related to HTTP. Specify a single key-value pair:
+
+=over 4
+
+=item * uri - the uri to send to - default is http://localhost
+
+=item * method - the method to send using - default is POST
+
+=back
+
+Use it multiple times to set multiple key-value pairs:
+
+    log --udp-data host=localhost --udp-data port=9002
 
 =item B<--file>, --no-file
 

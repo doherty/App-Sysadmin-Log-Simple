@@ -93,6 +93,17 @@ structure:
         port => 9002,       # What port to send to
     );
 
+=head3 http
+
+A hashref of data regarding HTTP usage. If you don't want to
+send a HTTP message, omit this. Otherwise, it has the following
+structure:
+
+    my %http_data = (
+        uri => 'http://localhost', # What uri to send to
+        method => 'post',          # What method to send using
+    );
+
 =head3 index_preamble
 
 The text to prepend to the index page. Can be anything - by
@@ -137,6 +148,7 @@ sub new {
         user        => $opts{user} || $ENV{SUDO_USER} || $ENV{USER},
         in          => $opts{read_from} || \*STDIN,
         udp         => $opts{udp},
+        http        => $opts{http},
     }, $class;
 }
 
