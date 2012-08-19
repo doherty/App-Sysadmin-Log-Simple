@@ -2,6 +2,7 @@ package App::Sysadmin::Log::Simple::Http;
 use strict;
 use warnings;
 use Carp;
+use LWP::UserAgent;
 #use autodie qw(:socket); # fail, i dont know how to use autodie
 
 my $HTTP_TIMEOUT = 10;
