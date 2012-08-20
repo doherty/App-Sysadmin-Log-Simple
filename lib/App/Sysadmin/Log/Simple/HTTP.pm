@@ -1,4 +1,4 @@
-package App::Sysadmin::Log::Simple::Http;
+package App::Sysadmin::Log::Simple::HTTP;
 use strict;
 use warnings;
 use Carp;
