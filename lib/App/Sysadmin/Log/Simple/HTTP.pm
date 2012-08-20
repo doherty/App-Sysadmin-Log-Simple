@@ -80,13 +80,20 @@ sub log {
 
         $res = $ua->get($uri);
 
-    } elsif ( lc $self->{http}->{method} eq 'post' ) {
+    }
+    elsif ( lc $self->{http}->{method} eq 'post' ) {
 
         $res = $ua->post($self->{http}->{uri}, { user => $self->{user}, log => $logentry });
 
-    } elsif ( lc $self->{http}->{method} eq 'put' ) {
+    }
+    elsif ( lc $self->{http}->{method} eq 'put' ) {
 
         $res = $ua->put($self->{http}->{uri}, { user => $self->{user}, log => $logentry });
+
+    }
+    else {
+
+       carp 'This shouldnt happen, as the method is populated internally. Something bad has happened'
 
     }
 
