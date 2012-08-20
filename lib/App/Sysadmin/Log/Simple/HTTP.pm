@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Carp;
 use LWP::UserAgent;
+use URI::Escape qw(uri_escape);
 #use autodie qw(:socket); # fail, i dont know how to use autodie
 
 my $HTTP_TIMEOUT = 10;
@@ -76,7 +77,7 @@ sub log {
 
         my $uri = $self->{http}->{uri};
         $uri .= ($uri =~ m/\?/) ? '&' : '?';
-        $uri .= sprintf('user=%s&log=%s',$self->{user},$logentry); #FIXME these need to be escaped
+        $uri .= sprintf('user=%s&log=%s',uri_escape($self->{user}),uri_escape($logentry));
 
         $res = $ua->get($uri);
 
