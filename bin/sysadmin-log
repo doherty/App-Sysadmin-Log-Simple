@@ -129,7 +129,7 @@ Sets data related to HTTP. Specify a single key-value pair:
 
 Use it multiple times to set multiple key-value pairs:
 
-    log --udp-data host=localhost --udp-data port=9002
+    log --http-data uri=http://localhost --http-data method=post
 
 =item B<--file>, --no-file
 
