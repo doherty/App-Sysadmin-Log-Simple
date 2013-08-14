@@ -1,3 +1,5 @@
+use lib 'inc';
+use Devel::AssertOS qw[-Win32];
 
 use strict;
 use warnings;
