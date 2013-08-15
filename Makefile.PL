@@ -14,20 +14,14 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "application class for managing a simple sysadmin log",
   "AUTHOR" => "Mike Doherty <doherty\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "File::Find" => 0,
-    "File::Temp" => 0,
-    "IO::Scalar" => 0,
-    "Module::Build" => "0.3601",
-    "Test::More" => "0.96",
-    "Test::Output" => 0
+    "Module::Build" => "0.3601"
   },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.30",
     "Module::Build" => "0.3601"
   },
   "DISTNAME" => "App-Sysadmin-Log-Simple",
   "EXE_FILES" => [
-    "bin/log"
+    "bin/sysadmin-log"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::Sysadmin::Log::Simple",
@@ -38,25 +32,48 @@ my %WriteMakefileArgs = (
     "DateTime::TimeZone" => 0,
     "File::Find::Rule" => 0,
     "File::HomeDir" => 0,
-    "File::Path" => "2.07",
-    "File::Spec" => 0,
     "Getopt::Long" => 0,
+    "HTTP::Tiny" => 0,
     "IO::Pager" => 0,
     "IO::Socket::INET" => 0,
     "Module::Pluggable" => 0,
-    "Net::Twitter::Lite" => 0,
+    "Net::Twitter::Lite::WithAPIv1_1" => 0,
+    "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "Try::Tiny" => 0,
+    "URI::Escape" => 0,
     "autodie" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.005",
+  "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
+    "IO::Scalar" => 0,
+    "Test::More" => "0.96",
+    "Test::Output" => 0,
+    "Test::Requires" => 0,
+    "Test::Script" => "1.05",
+    "blib" => 0
+  },
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
+  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};

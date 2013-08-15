@@ -1,6 +1,8 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+
+0.006     2013-08-15
   - Give up on Win32 support
   - Rename "log" executable to "sysadmin-log" (so use uninst=1) [gh-14]
   - Switch from File::Spec to Path::Tiny (<3!)

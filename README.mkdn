@@ -4,7 +4,7 @@ App::Sysadmin::Log::Simple - application class for managing a simple sysadmin lo
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
@@ -78,6 +78,17 @@ structure:
         irc => 1,           # Whether to insert IRC colour codes
         host => 'localhost',# What hostname to send to
         port => 9002,       # What port to send to
+    );
+
+### http
+
+A hashref of data regarding HTTP usage. If you don't want to
+send a HTTP message, omit this. Otherwise, it has the following
+structure:
+
+    my %http_data = (
+        uri => 'http://localhost', # What uri to send to
+        method => 'post',          # What method to send using
     );
 
 ### index\_preamble
