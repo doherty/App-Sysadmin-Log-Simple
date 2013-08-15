@@ -116,7 +116,7 @@ sub log {
         open my $logfh, '>>', $logfile;
         my $line = $self->{date}->day_name . ' ' . $self->{date}->month_name . " $day, $year";
         say $logfh $line;
-        say $logfh "=" x length($line), "\n";
+        say $logfh '=' x length($line), "\n";
         close $logfh; # Explicitly close before calling generate_index() so the file is found
         $self->_generate_index();
     }
@@ -146,10 +146,14 @@ sub _generate_index {
     my @files = File::Find::Rule->mindepth(3)->in($self->{logdir});
     my @dates;
     foreach (@files) {
-        if (m!(\d{4}/\d{1,2}/\d{1,2})!) { # Extract the date
-            my $date = $1;
-            my ($year, $month, $day) = split /\//, $date;
-            push @dates, [$year, $month, $day];
+        if (m{
+            (?<year>\d{4})
+            /
+            (?<month>\d{1,2})
+            /
+            (?<day>\d{1,2})
+        }x) { # Extract the date
+            push @dates, [$+{year}, $+{month}, $+{day}];
         }
         else {
             warn "WTF: $_";
