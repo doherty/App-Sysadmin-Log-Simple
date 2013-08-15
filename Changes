@@ -4,6 +4,7 @@ Revision history for Perl module App-Sysadmin-Log
   - Give up on Win32 support
   - Rename "log" executable to "sysadmin-log" (so use uninst=1) [gh-14]
   - Switch from File::Spec to Path::Tiny (<3!)
+  - Use Net::Twitter::Lite::WithAPIv1_1
 
 0.005     2012-06-05
   - Remove perl5i - too slow

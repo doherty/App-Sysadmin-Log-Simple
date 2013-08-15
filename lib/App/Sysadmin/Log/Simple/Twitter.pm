@@ -76,7 +76,7 @@ sub log {
 
     return unless $self->{do_twitter};
 
-    require Net::Twitter::Lite;
+    require Net::Twitter::Lite::WithAPIv1_1;
 
     warn "You should do: chmod 600 $self->{oauth_file}\n"
         if ($self->{oauth_file}->stat->mode & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
@@ -85,19 +85,21 @@ sub log {
 
     my $ua = __PACKAGE__
         . '/' . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev');
-    my $t = Net::Twitter::Lite->new(
+    my $t = Net::Twitter::Lite::WithAPIv1_1->new(
         consumer_key        => $oauth{consumer_key},
         consumer_secret     => $oauth{consumer_secret},
+        access_token        => $oauth{oauth_token},
+        access_token_secret => $oauth{oauth_token_secret},
+        ssl                 => 1,
         useragent           => $ua,
-        legacy_lists_api    => 0
     );
     $t->access_token($oauth{oauth_token});
     $t->access_token_secret($oauth{oauth_token_secret});
 
     my $result = $t->update($logentry);
-    die "Something went wrong" unless $result->{text} eq $logentry;
+    die 'Something went wrong' unless $result->{text} eq $logentry;
 
-    my $url = 'https://twitter.com/#!/'
+    my $url = 'https://twitter.com/'
         . $result->{user}->{screen_name}
         . '/status/' . $result->{id_str};
     return "Posted to Twitter: $url";
