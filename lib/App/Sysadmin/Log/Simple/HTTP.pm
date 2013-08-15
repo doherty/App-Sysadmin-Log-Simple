@@ -1,15 +1,14 @@
 package App::Sysadmin::Log::Simple::HTTP;
 use strict;
 use warnings;
-use Carp;
-use LWP::UserAgent;
-use URI::Escape qw(uri_escape);
-#use autodie qw(:socket); # fail, i dont know how to use autodie
-
-my $HTTP_TIMEOUT = 10;
-
-# ABSTRACT: a HTTP (maybe RESTful?) based logger for App::Sysadmin::Log::Simple
+# ABSTRACT: a HTTP (maybe RESTful?) logger for App::Sysadmin::Log::Simple
 # VERSION
+
+use Carp;
+use HTTP::Tiny;
+use URI::Escape qw(uri_escape);
+
+our $HTTP_TIMEOUT = 10;
 
 =head1 DESCRIPTION
 
@@ -21,7 +20,7 @@ will work. Though you might not be shown to be sane for doing so.
 
 =head2 new
 
-This creates a new App::Sysadmin::Log::Simple::Http object. It takes a hash
+This creates a new App::Sysadmin::Log::Simple::HTTP object. It takes a hash
 of options:
 
 =head3 http
@@ -49,6 +48,7 @@ sub new {
 
     $app->{http}->{uri} ||= 'http://localhost';
     $app->{http}->{method} ||= 'post';
+    $app->{http}->{method} = uc $app->{http}->{method};
 
     return bless {
         do_http => $app->{do_http},
@@ -69,37 +69,43 @@ sub log {
 
     return unless $self->{do_http};
 
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($HTTP_TIMEOUT);
-    my $res;
+    my $ua = HTTP::Tiny->new(
+        timeout => $HTTP_TIMEOUT,
+        agent   => __PACKAGE__ . '/' . (__PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev'),
+    );
+    my $res = sub {
+        if ( $self->{http}->{method} eq 'GET' ) {
+            my $params = $ua->www_form_urlencode({
+                user => $self->{user},
+                log  => $logentry,
+            });
+            my $uri = $self->{http}->{uri} . "?$params";
 
-    if ( lc $self->{http}->{method} eq 'get' ) {
-
-        my $uri = $self->{http}->{uri};
-        $uri .= ($uri =~ m/\?/) ? '&' : '?';
-        $uri .= sprintf('user=%s&log=%s',uri_escape($self->{user}),uri_escape($logentry));
-
-        $res = $ua->get($uri);
-
-    }
-    elsif ( lc $self->{http}->{method} eq 'post' ) {
-
-        $res = $ua->post($self->{http}->{uri}, { user => $self->{user}, log => $logentry });
-
-    }
-    elsif ( lc $self->{http}->{method} eq 'put' ) {
-
-        $res = $ua->put($self->{http}->{uri}, { user => $self->{user}, log => $logentry });
-
-    }
-    else {
-
-       carp 'This shouldnt happen, as the method is populated internally. Something bad has happened'
-
-    }
+            return $ua->get($uri);
+        }
+        elsif ( $self->{http}->{method} eq 'POST' ) {
+            return $ua->post_form($self->{http}->{uri}, {
+                user => $self->{user},
+                log  => $logentry,
+            });
+        }
+        elsif ( $self->{http}->{method} eq 'PUT' ) {
+            return $ua->put($self->{http}->{uri}, {
+                user => $self->{user},
+                log  => $logentry,
+            });
+        }
+        else {
+           croak 'This shouldnt happen, as the method is populated internally. Something bad has happened'
+        }
+    }->();
 
     carp sprintf('Failed to http log via %s to %s with code %d and error %s',
-		$self->{http}->{method},$self->{http}->{uri},$res->code,$res->status_line);
+		$self->{http}->{method},
+        $self->{http}->{uri},
+        $res->{status},
+        $res->{reason},
+    ) unless $res->{success};
 
     return "Logged to $self->{http}->{uri} via $self->{http}->{method}"
 }
