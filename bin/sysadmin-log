@@ -7,7 +7,7 @@ use Pod::Usage;
 use File::HomeDir;
 use App::Sysadmin::Log::Simple;
 
-# PODNAME: log
+# PODNAME: sysadmin-log
 # ABSTRACT: maintain a single-host system administration log
 # VERSION
 
@@ -64,7 +64,7 @@ $opts{http} = \%http_data if $opts{do_http};
 
 =head1 SYNOPSIS
 
-B<log> [--date YYYY/MM/DD] [--view] [--version] [--help]
+B<sysadmin-log> [--date YYYY/MM/DD] [--view] [--version] [--help]
 
 Options:
     B<--date>       Read from/write to a date other than today's
@@ -86,7 +86,7 @@ Options:
 
 =head1 DESCRIPTION
 
-C<B<log>> allows you to maintain a single-host system
+C<B<sysadmin-log>> allows you to maintain a single-host system
 administration log with simple shell commands.
 
 =head2 OPTIONS
@@ -187,27 +187,27 @@ if ($opts{version}) {
 
 =head1 EXAMPLES
 
-B<log>
+B<sysadmin-log>
 
 Add something to today's log.
 
-B<log --view --date 2011/01/01>
+B<sysadmin-log --view --date 2011/01/01>
 
 View the log for January 1, 2011, if it exists.
 
-B<log --no-udp>
+B<sysadmin-log --no-udp>
 
 Don't send a UDP datagram while adding to today's log
 
-B<log --refresh-index>
+B<sysadmin-log --refresh-index>
 
 Re-generate the index page for the logs.
 
-B<log --udp-data host=192.168.0.3 --udp-data port=5001>
+B<sysadmin-log --udp-data host=192.168.0.3 --udp-data port=5001>
 
 Send the UDP datagram somewhere other than the default.
 
-B<log --udp-data irc=0>
+B<sysadmin-log --udp-data irc=0>
 
 Don't apply IRC colouring to the log data send via UDP.
 

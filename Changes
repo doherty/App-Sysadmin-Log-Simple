@@ -1,6 +1,7 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+  - Update documentation to refer to the right executable name
 
 0.006     2013-08-15
   - Give up on Win32 support
