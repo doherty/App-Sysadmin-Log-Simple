@@ -1,49 +1,33 @@
 use strict;
 use warnings;
-use autodie qw(:file :filesys);
-use File::Temp;
-use File::Spec;
+
+use Path::Tiny;
 use IO::Scalar;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Output;
 use App::Sysadmin::Log::Simple;
+use App::Sysadmin::Log::Simple::File;
 
 my $rand = rand;
 my $logentry = IO::Scalar->new(\$rand);
-my $year  = 2011;
-my $month = 2;
-my $day   = 18;
+my $date = '2013/8/14';
 
+my $tmpdir = Path::Tiny->tempdir;
 my $log = new_ok('App::Sysadmin::Log::Simple' => [
-    logdir      => 't/log',
+    logdir      => $tmpdir,
     read_from   => $logentry,
-    date        => "$year/$month/$day",
+    date        => $date,
 ]);
 
-my $idx_old = do {
-    local $/;
-    open my $idxfh, '<', File::Spec->catfile(qw/ t log index.log/);
-    <$idxfh>
-};
+my $file_logger = new_ok('App::Sysadmin::Log::Simple::File' => [logdir => $tmpdir]);
+$file_logger->_generate_index();
 
+my $idx_old = path($tmpdir, 'index.log')->slurp_utf8;
 stdout_like
     sub { $log->run() }, # will read from $logentry
     qr/Log entry:/,
     'log ok';
+my $idx_new = path($tmpdir, 'index.log')->slurp_utf8;
 
-my $idx_new = do {
-    local $/;
-    open my $idxfh, '<', File::Spec->catfile(qw/ t log index.log/);
-    <$idxfh>
-};
-
-isnt $idx_old, $idx_new, 'The index did change' ;
-like $idx_new, qr{\Q($year/$month/$day)\E}, 'The date we wanted appears in the index';
-
-END { # Set things back the way they were
-    unlink File::Spec->catfile('t', 'log', $year, $month, "$day.log")
-        if -e File::Spec->catfile('t', 'log', $year, $month, "$day.log");
-    require App::Sysadmin::Log::Simple::File;
-    my $file_logger = App::Sysadmin::Log::Simple::File->new(logdir => File::Spec->catfile(qw/t log/));
-    $file_logger->_generate_index();
-}
+isnt $idx_old, $idx_new, 'The index did change';
+like $idx_new, qr{\Q($date)\E}, 'The date we wanted appears in the index';

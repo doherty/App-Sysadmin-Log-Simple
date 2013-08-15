@@ -2,15 +2,15 @@ package App::Sysadmin::Log::Simple;
 use strict;
 use warnings;
 use v5.10.1;
+# ABSTRACT: application class for managing a simple sysadmin log
+# VERSION
+
 use autodie qw(:file :filesys);
 use DateTime;
 use Carp;
 use Module::Pluggable
     search_path => [__PACKAGE__],
     instantiate => 'new';
-
-# ABSTRACT: application class for managing a simple sysadmin log
-# VERSION
 
 =head1 SYNOPSIS
 

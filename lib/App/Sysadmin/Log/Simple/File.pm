@@ -1,14 +1,13 @@
 package App::Sysadmin::Log::Simple::File;
 use strict;
 use warnings;
+# ABSTRACT: a file-logger for App::Sysadmin::Log::Simple
+# VERSION
+
 use Carp;
 use Try::Tiny;
 use autodie qw(:file :filesys);
-use File::Spec;
-use File::Path 2.07 qw(make_path);
-
-# ABSTRACT: a file-logger for App::Sysadmin::Log::Simple
-# VERSION
+use Path::Tiny;
 
 =head1 DESCRIPTION
 
@@ -53,7 +52,7 @@ sub new {
     my $app   = $opts{app};
 
     return bless {
-        logdir          => $app->{logdir} || $opts{logdir} || File::Spec->catdir( File::Spec->rootdir(), qw( var log sysadmin ) ),
+        logdir          => path( $app->{logdir} || $opts{logdir} || qw(/ var log sysadmin) ),
         index_preamble  => $app->{index_preamble},
         view_preamble   => $app->{view_preamble},
         date            => $app->{date},
@@ -76,20 +75,16 @@ sub view {
     my $day   = $self->{date}->day;
     require IO::Pager;
 
-    my $logfile = File::Spec->catfile($self->{logdir}, $year, $month, "$day.log");
-    my $logfh;
-    try {
-        open $logfh, '<', $logfile;
-    }
-    catch {
-        die "No log for $year/$month/$day\n"
-            unless -e $logfile;
-        die $_;
-    };
+    my $logfile = path($self->{logdir}, $year, $month, "$day.log");
+    die "No log for $year/$month/$day\n" unless $logfile->is_file;
+
+    my $logfh = $logfile->openr_utf8;
     local $STDOUT = IO::Pager->new(*STDOUT)
         unless $ENV{__PACKAGE__.' under test'};
     say($self->{view_preamble}) if $self->{view_preamble};
     print while (<$logfh>);
+    close $logfh;
+
     return;
 }
 
@@ -106,18 +101,18 @@ sub log {
 
     return unless $self->{do_file};
 
-    make_path $self->{logdir} unless -d $self->{logdir};
+    $self->{logdir}->mkpath unless $self->{logdir}->is_dir;
 
     my $year  = $self->{date}->year;
     my $month = $self->{date}->month;
     my $day   = $self->{date}->day;
 
-    my $dir = File::Spec->catdir($self->{logdir}, $year, $month);
-    make_path $dir unless -d $dir;
-    my $logfile = File::Spec->catfile($self->{logdir}, $year, $month, "$day.log");
+    my $dir = path($self->{logdir}, $year, $month);
+    $dir->mkpath unless $dir->is_dir;
+    my $logfile = path($self->{logdir}, $year, $month, "$day.log");
 
     # Start a new log file if one doesn't exist already
-    unless (-e $logfile) {
+    unless ($logfile->is_file) {
         open my $logfh, '>>', $logfile;
         my $line = $self->{date}->day_name . ' ' . $self->{date}->month_name . " $day, $year";
         say $logfh $line;
@@ -144,7 +139,7 @@ sub _generate_index {
     my $self = shift;
     require File::Find::Rule;
 
-    open my $indexfh, '>', File::Spec->catfile($self->{logdir}, 'index.log'); # clobbers the file
+    my $indexfh = path($self->{logdir}, 'index.log')->openw_utf8; # clobbers the file
     say $indexfh $self->{index_preamble} if defined $self->{index_preamble};
 
     # Find relevant log files
@@ -188,6 +183,7 @@ sub _generate_index {
             say $indexfh "[$day]($year/$month/$day)"
         }
     }
+    close $indexfh;
     return;
 }
 

@@ -1,18 +1,18 @@
 use strict;
 use warnings;
-use autodie qw(:file :filesys);
-use File::Spec;
-use Test::Output qw(output_from);
 use Test::More 0.96 tests => 4;
-use IO::Scalar;
+
 use App::Sysadmin::Log::Simple;
+use Path::Tiny;
+use Test::Output qw(output_from);
+use IO::Scalar;
 
 my $rand = rand;
 my $logentry = IO::Scalar->new(\$rand);
 $ENV{'App::Sysadmin::Log::Simple::File under test'} = 1;
 my $app = new_ok('App::Sysadmin::Log::Simple' => [
-    logdir      => File::Spec->catdir(qw( t log )),
-    date        => '2011/02/19',
+    logdir      => Path::Tiny->tempdir,
+    date        => '2011/02/20',
     read_from   => $logentry,
 ]);
 
@@ -40,17 +40,3 @@ subtest 'log-fail' => sub {
     like $stdout, qr/Log entry:/, 'Log entry requested';
     like $@, qr/A log entry is needed/, 'Logging with no entry is fatal';
 };
-
-END {
-    my $file = File::Spec->catfile(qw( t log 2011 2 19.log));
-    open my $log, '>', $file;
-    while (<DATA>) { chomp; print $log $_; }
-    close $log;
-}
-
-__DATA__
-Saturday February 19, 2011
-==========================
-
-    14:36:49 mike:	hello
-    14:38:14 mike:	hello

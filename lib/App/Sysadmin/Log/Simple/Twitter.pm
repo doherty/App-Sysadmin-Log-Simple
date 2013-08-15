@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use autodie qw(:file :filesys);
 use Config::General qw(ParseConfig);
+use Path::Tiny;
 
 # ABSTRACT: a Twitter-logger for App::Sysadmin::Log::Simple
 # VERSION
@@ -50,12 +51,11 @@ sub new {
     }
     else {
         require File::HomeDir;
-        require File::Spec;
 
         my $HOME = File::HomeDir->users_home(
             $app->{user} || $ENV{SUDO_USER} || $ENV{USER}
         );
-        $oauth_file = File::Spec->catfile($HOME, '.sysadmin-log-twitter-oauth');
+        $oauth_file = path($HOME, '.sysadmin-log-twitter-oauth');
     }
 
     return bless {
@@ -79,7 +79,7 @@ sub log {
     require Net::Twitter::Lite;
 
     warn "You should do: chmod 600 $self->{oauth_file}\n"
-        if ((stat $self->{oauth_file})[2] & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+        if ($self->{oauth_file}->stat->mode & 07777) != 0600; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
     my $conf = Config::General->new($self->{oauth_file});
     my %oauth = $conf->getall();
 

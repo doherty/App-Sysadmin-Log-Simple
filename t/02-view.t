@@ -1,20 +1,20 @@
 use strict;
 use warnings;
-use autodie qw(:file :filesys);
 use Test::More tests => 1;
-use Test::Output;
+
 use App::Sysadmin::Log::Simple;
+use Test::Output;
+use Path::Tiny;
 
 $ENV{'App::Sysadmin::Log::Simple::File under test'} = 1;
+my $tmpdir = Path::Tiny->tempdir;
 my $log = App::Sysadmin::Log::Simple->new(
-    logdir  => 't/log',
+    logdir  => $tmpdir,
     date    => '2011/02/19',
 );
 
 my $should = do { local $/; <DATA> };
-open my $testfh, '>', 't/log/2011/2/19.log';
-print $testfh $should;
-close $testfh;
+path($tmpdir, qw/ 2011 2 19.log/)->touchpath->spew_utf8($should);
 
 stdout_is sub { $log->run('view') }, $should, 'Reads the file ok';
 

@@ -4,7 +4,7 @@ use Test::More tests => 2;
 use App::Sysadmin::Log::Simple::Twitter;
 
 my $log = new_ok('App::Sysadmin::Log::Simple::Twitter', [
-    app         => { do_twitter => 1 },
+    app => { do_twitter => 1 },
 ]);
 
 SKIP: {
