@@ -67,21 +67,23 @@ a git repository for additional tracking.
 Obviously, the constructor returns an C<App::Sysadmin::Log::Simple>
 object. It takes a hash of options which specify:
 
-=head3 logdir
+=over 4
+
+=item * logdir
 
 The directory where to find the sysadmin log. Defaults to
 F</var/log/sysadmin>.
 
-=head3 user
+=item * user
 
 The user who owns the sysadmin log. Should be unprivileged,
 but could be anything. Defaults to the current user.
 
-=head3 date
+=item * date
 
 The date to use instead of today.
 
-=head3 udp
+=item * udp
 
 A hashref of data regarding UDP usage. If you don't want to
 send a UDP datagram, omit this. Otherwise, it has the following
@@ -93,7 +95,7 @@ structure:
         port => 9002,       # What port to send to
     );
 
-=head3 http
+=item * http
 
 A hashref of data regarding HTTP usage. If you don't want to
 send a HTTP message, omit this. Otherwise, it has the following
@@ -104,22 +106,24 @@ structure:
         method => 'post',          # What method to send using
     );
 
-=head3 index_preamble
+=item * index_preamble
 
 The text to prepend to the index page. Can be anything - by
 default, it is a short explanation of the rationale for using
 this system of logging, which probably won't make sense
 for your context.
 
-=head3 view_preamble
+=item * view_preamble
 
 A string which gets prepended to the log being viewed (ie. at
 the top of the log file).
 
-=head3 read_from
+=item * read_from
 
 An opened filehandle reference to read from to get the log entry.
 Defaults to C<STDIN>.
+
+=back
 
 =cut
 
