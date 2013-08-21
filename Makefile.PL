@@ -1,5 +1,5 @@
 use lib 'inc';
-use Devel::AssertOS qw[-Win32];
+use Devel::AssertOS qw[-MSWin32];
 
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::Script" => "1.05",
     "blib" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,5 @@
 use lib 'inc';
-use Devel::AssertOS qw[-Win32];
+use Devel::AssertOS qw[-MSWin32];
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ my %module_build_args = (
     "Mike Doherty <doherty\@cpan.org>"
   ],
   "dist_name" => "App-Sysadmin-Log-Simple",
-  "dist_version" => "0.006",
+  "dist_version" => "0.007",
   "license" => "perl",
   "module_name" => "App::Sysadmin::Log::Simple",
   "recommends" => {},
