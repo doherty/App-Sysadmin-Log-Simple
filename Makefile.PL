@@ -49,13 +49,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
     "IO::Scalar" => 0,
+    "Path::Tiny" => "0.008",
     "Test::More" => "0.96",
     "Test::Output" => 0,
     "Test::Requires" => 0,
     "Test::Script" => "1.05",
     "blib" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

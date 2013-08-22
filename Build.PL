@@ -19,7 +19,7 @@ my %module_build_args = (
     "Mike Doherty <doherty\@cpan.org>"
   ],
   "dist_name" => "App-Sysadmin-Log-Simple",
-  "dist_version" => "0.007",
+  "dist_version" => "0.008",
   "license" => "perl",
   "module_name" => "App::Sysadmin::Log::Simple",
   "recommends" => {},
@@ -52,6 +52,7 @@ my %module_build_args = (
   "test_requires" => {
     "Capture::Tiny" => 0,
     "IO::Scalar" => 0,
+    "Path::Tiny" => "0.008",
     "Test::More" => "0.96",
     "Test::Output" => 0,
     "Test::Requires" => 0,
