@@ -4,7 +4,7 @@ use Test::More tests => 1;
 
 use App::Sysadmin::Log::Simple;
 use Test::Output;
-use Path::Tiny 0.008; # touchpath
+use Path::Tiny 0.015; # touchpath
 
 $ENV{'App::Sysadmin::Log::Simple::File under test'} = 1;
 my $tmpdir = Path::Tiny->tempdir;
