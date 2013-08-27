@@ -47,16 +47,17 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
     "IO::Scalar" => 0,
-    "Path::Tiny" => "0.008",
+    "IPC::Open3" => 0,
+    "Path::Tiny" => "0.015",
     "Test::More" => "0.96",
     "Test::Output" => 0,
     "Test::Requires" => 0,
-    "Test::Script" => "1.05",
-    "blib" => 0
+    "Test::Script" => "1.05"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

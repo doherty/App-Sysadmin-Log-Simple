@@ -1,6 +1,8 @@
 Revision history for Perl module App-Sysadmin-Log
 
 {{$NEXT}}
+
+0.009     2013-08-26
   - Actually, we need Path::Tiny 0.015 in the test suite
 
 0.008     2013-08-21
